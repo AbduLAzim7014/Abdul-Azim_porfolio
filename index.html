@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abdul Azim Ansari | Ultra-Advanced Cinematic Portfolio</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyberCyan: '#00f3ff',
+                        cyberPink: '#ff007f',
+                        cyberGold: '#ffd700',
+                        cyberGreen: '#00ff88',
+                        cyberPurple: '#a855f7',
+                        darkBg: '#03050d'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;600;800&family=Outfit:wght@500;700;900&display=swap"
+        rel="stylesheet">
+
+    <!-- FontAwesome & Lucide Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- GSAP & Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #00f3ff;
+            --secondary: #ff007f;
+            --accent: #ffd700;
+            --bg: #03050d;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: #f1f5f9;
+            overflow-x: hidden;
+            cursor: default;
+            transition: background-color 0.5s ease;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #03050d;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+        }
+
+        /* Dynamic Spotlight Cursor */
+        #custom-cursor {
+            pointer-events: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            width: 36px;
+            height: 36px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, background 0.2s;
+            box-shadow: 0 0 20px var(--primary), inset 0 0 10px var(--primary);
+        }
+
+        #custom-cursor-dot {
+            pointer-events: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10000;
+            width: 6px;
+            height: 6px;
+            background: var(--secondary);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px var(--secondary);
+        }
+
+        /* Viewport Canvas Stacking */
+        #bg-3d-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        #creature-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 40;
+            pointer-events: none;
+        }
+
+        #shockwave-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 45;
+            pointer-events: none;
+        }
+
+        /* Glassmorphism Panels */
+        .glass-panel {
+            background: rgba(10, 15, 30, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            border-color: rgba(0, 243, 255, 0.4);
+            box-shadow: 0 25px 60px rgba(0, 243, 255, 0.2);
+        }
+
+        /* Dynamic Cartoon Action Buttons */
+        .btn-cartoon {
+            position: relative;
+            transform: translateY(0);
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.6);
+        }
+
+        .btn-cartoon:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 12px 25px rgba(0, 243, 255, 0.35);
+        }
+
+        .btn-cartoon:active {
+            transform: translateY(2px) scale(0.97);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.6);
+        }
+
+        /* Glowing Text Utilities */
+        .glow-primary {
+            text-shadow: 0 0 20px var(--primary), 0 0 40px var(--primary);
+        }
+
+        .glow-secondary {
+            text-shadow: 0 0 20px var(--secondary), 0 0 40px var(--secondary);
+        }
+
+        /* 3D Tilt Card Perspective */
+        .card-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.2s ease-out;
+        }
+
+        /* Screen Shake Keyframe */
+        @keyframes cameraShake {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            20% {
+                transform: translate(-8px, 6px) rotate(-1deg);
+            }
+
+            40% {
+                transform: translate(8px, -6px) rotate(1deg);
+            }
+
+            60% {
+                transform: translate(-6px, -4px) rotate(-0.5deg);
+            }
+
+            80% {
+                transform: translate(6px, 4px) rotate(0.5deg);
+            }
+
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+        }
+
+        .shake-screen {
+            animation: cameraShake 0.4s ease-in-out;
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased selection:bg-cyberPink selection:text-white">
+
+    <!-- Custom Pointer & Viewport Canvases -->
+    <div id="custom-cursor"></div>
+    <div id="custom-cursor-dot"></div>
+    <div id="bg-3d-canvas"></div>
+    <canvas id="creature-canvas"></canvas>
+    <canvas id="shockwave-canvas"></canvas>
+
+    <!-- Top Navigation Bar -->
+    <nav
+        class="fixed top-0 left-0 w-full z-50 glass-panel border-b border-white/10 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div
+                class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyberCyan via-cyberPurple to-cyberPink p-0.5 shadow-lg shadow-cyberCyan/30">
+                <div
+                    class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center font-black text-xl text-cyberCyan">
+                    AA
+                </div>
+            </div>
+            <div>
+                <span class="font-display font-black text-lg tracking-wider text-white block leading-none">AZIM <span
+                        class="text-cyberCyan">ANSARI</span></span>
+                <span class="text-[10px] text-gray-400 font-mono tracking-widest uppercase">Full-Stack Engineer</span>
+            </div>
+        </div>
+
+        <div class="hidden lg:flex items-center space-x-7 text-xs font-bold font-mono tracking-widest text-gray-300">
+            <a href="#hero" class="hover:text-cyberCyan transition-colors">// HERO</a>
+            <a href="#about" class="hover:text-cyberPink transition-colors">// ABOUT</a>
+            <a href="#creatures" class="hover:text-cyberGold transition-colors">// CREATURES</a>
+            <a href="#skills" class="hover:text-cyberGreen transition-colors">// ARSENAL</a>
+            <a href="#projects" class="hover:text-cyberCyan transition-colors">// PROJECTS</a>
+            <a href="#experience" class="hover:text-cyberPurple transition-colors">// TIMELINE</a>
+            <a href="#playground" class="hover:text-cyberGreen transition-colors">// ARENA</a>
+            <a href="#terminal" class="hover:text-cyberPink transition-colors">// CLI</a>
+            <a href="#contact" class="hover:text-cyberGold transition-colors">// CONNECT</a>
+        </div>
+
+        <!-- Controls: Sound + Themes -->
+        <div class="flex items-center space-x-3">
+            <select id="theme-selector" onchange="changeTheme(this.value)"
+                class="bg-slate-900 border border-slate-700 text-xs font-mono text-gray-300 rounded-xl px-2.5 py-2 focus:outline-none focus:border-cyberCyan cursor-pointer">
+                <option value="cyber">⚡ Cyber Neon</option>
+                <option value="space">🌌 Deep Space</option>
+                <option value="gold">👑 Sunset Gold</option>
+                <option value="matrix">01 Matrix Green</option>
+            </select>
+
+            <button id="sound-btn" onclick="toggleAudio()"
+                class="p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-cyberCyan hover:border-cyberCyan transition-all flex items-center justify-center"
+                title="Toggle Sound Synth">
+                <i class="fa-solid fa-volume-high text-sm" id="sound-icon"></i>
+            </button>
+
+            <a href="https://github.com/AbduLAzim7014" target="_blank"
+                class="px-4 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono text-xs hover:border-cyberCyan hover:text-cyberCyan transition-all flex items-center gap-2">
+                <i class="fa-brands fa-github text-sm"></i> GitHub
+            </a>
+        </div>
+    </nav>
+
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <main id="app-wrapper" class="relative z-10 pt-28 space-y-28">
+
+        <!-- SECTION 1: HERO & CARTOON MASCOT -->
+        <section id="hero" class="min-h-[85vh] relative flex items-center justify-center px-6 overflow-hidden">
+            <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <div
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border-cyberCyan/30 text-cyberCyan text-xs font-mono font-semibold uppercase tracking-wider">
+                        <span class="w-2.5 h-2.5 rounded-full bg-cyberCyan animate-ping"></span> Jodhpur, Rajasthan,
+                        India
+                    </div>
+
+                    <h1
+                        class="font-display font-black text-4xl sm:text-6xl md:text-7xl text-white tracking-tight leading-none">
+                        ABDUL AZIM <br>
+                        <span
+                            class="text-transparent bg-clip-text bg-gradient-to-r from-cyberCyan via-teal-300 to-cyberGreen glow-primary">ANSARI</span>
+                    </h1>
+
+                    <p class="text-lg sm:text-2xl font-mono text-cyberPink font-bold tracking-wide glow-secondary">
+                        Full-Stack Web Developer & Software Engineer
+                    </p>
+
+                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed max-w-2xl font-light">
+                        Engineering scalable web platforms, administrative panels, and voice desktop automation tools
+                        with <span class="text-cyberCyan font-semibold">Python, Flask, React.js, Tailwind CSS, and
+                            SQL</span>.
+                    </p>
+
+                    <div class="flex flex-wrap justify-center lg:justify-start gap-4 pt-2">
+                        <button onclick="triggerCreature('dragon')"
+                            class="btn-cartoon px-6 py-3.5 rounded-2xl bg-gradient-to-r from-cyberCyan to-blue-600 text-slate-950 font-black text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-dragon"></i> Phoenix Dragon
+                        </button>
+                        <button onclick="triggerCreature('panther')"
+                            class="btn-cartoon px-6 py-3.5 rounded-2xl bg-gradient-to-r from-cyberPink to-purple-600 text-white font-black text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-bolt"></i> Cyber Panther
+                        </button>
+                        <a href="#projects"
+                            class="px-6 py-3.5 rounded-2xl glass-panel text-white font-semibold text-sm hover:border-cyberGold hover:text-cyberGold transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-folder-open"></i> Projects
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right Mascot "Jarvis Bot" -->
+                <div class="lg:col-span-5 flex flex-col items-center justify-center relative">
+                    <div id="mascot-speech"
+                        class="glass-panel p-4 rounded-2xl border-cyberCyan text-xs font-mono text-cyberCyan mb-4 max-w-xs text-center shadow-xl">
+                        "Hello! I am Jarvis Bot 🤖. Click me or trigger creatures below!"
+                    </div>
+
+                    <div onclick="clickMascot()"
+                        class="w-64 h-64 sm:w-72 sm:h-72 cursor-pointer relative group transition-transform hover:scale-105">
+                        <svg id="jarvis-mascot-svg" class="w-full h-full drop-shadow-[0_0_25px_rgba(0,243,255,0.4)]"
+                            viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="100" y1="35" x2="100" y2="15" stroke="#00f3ff" stroke-width="4"
+                                stroke-linecap="round" />
+                            <circle id="antenna-orb" cx="100" cy="12" r="7" fill="#ff007f" />
+
+                            <rect x="40" y="35" width="120" height="90" rx="25" fill="#0c1123" stroke="#00f3ff"
+                                stroke-width="5" />
+                            <rect x="52" y="50" width="96" height="60" rx="15" fill="#050714" stroke="#ff007f"
+                                stroke-width="3" />
+
+                            <g id="mascot-eyes">
+                                <circle cx="75" cy="80" r="14" fill="#00f3ff" />
+                                <circle id="pupil-left" cx="75" cy="80" r="6" fill="#050714" />
+
+                                <circle cx="125" cy="80" r="14" fill="#00f3ff" />
+                                <circle id="pupil-right" cx="125" cy="80" r="6" fill="#050714" />
+                            </g>
+
+                            <path id="mascot-mouth" d="M 85 98 Q 100 108 115 98" stroke="#ffd700" stroke-width="4"
+                                stroke-linecap="round" fill="none" />
+
+                            <circle cx="35" cy="80" r="8" fill="#a855f7" />
+                            <circle cx="165" cy="80" r="8" fill="#a855f7" />
+
+                            <rect x="65" y="130" width="70" height="50" rx="15" fill="#0c1123" stroke="#00f3ff"
+                                stroke-width="4" />
+                            <circle cx="100" cy="155" r="10" fill="#00ff88" />
+                        </svg>
+                    </div>
+
+                    <span class="text-[11px] font-mono text-gray-400 mt-2">💡 Click Jarvis Bot for Sound & Voice
+                        Audio!</span>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- SECTION 2: ABOUT & PROFILE JOURNEY -->
+        <section id="about" class="py-16 px-6 max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+
+                <div class="md:col-span-5 glass-panel p-8 rounded-3xl text-center card-3d">
+                    <div
+                        class="w-32 h-32 mx-auto rounded-2xl bg-gradient-to-tr from-cyberCyan to-cyberPink p-1 shadow-2xl mb-6">
+                        <div
+                            class="w-full h-full bg-slate-950 rounded-xl flex items-center justify-center text-5xl text-cyberCyan">
+                            👨‍💻
+                        </div>
+                    </div>
+
+                    <h3 class="font-display font-bold text-2xl text-white">Abdul Azim Ansari</h3>
+                    <p class="text-xs font-mono text-cyberCyan mt-1"><i class="fa-solid fa-location-dot mr-1"></i>
+                        Jodhpur, Rajasthan, India</p>
+
+                    <div class="mt-6 pt-6 border-t border-slate-800 space-y-3 text-left text-xs font-mono">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Current Qualification:</span>
+                            <span class="text-cyberGold font-semibold">BCA Graduate & MCA Student</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">University:</span>
+                            <span class="text-white">Maulana Azad University</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Specialization:</span>
+                            <span class="text-cyberGreen font-semibold">Full-Stack Web Stack</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">GitHub:</span>
+                            <a href="https://github.com/AbduLAzim7014" target="_blank"
+                                class="text-cyberCyan hover:underline">AbduLAzim7014</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-7 space-y-6">
+                    <div
+                        class="inline-block px-3 py-1 rounded-full bg-cyberPink/10 border border-cyberPink/30 text-cyberPink text-xs font-mono font-semibold uppercase">
+                        About My Journey
+                    </div>
+                    <h2 class="font-display font-black text-3xl sm:text-5xl text-white leading-tight">
+                        Engineered with <span class="text-cyberCyan glow-primary">Precision & Passion</span>
+                    </h2>
+                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed">
+                        Full-Stack Developer skilled in constructing modern web applications, admin control centers, and
+                        desktop voice assistants using Python, Flask, React.js, Tailwind CSS, and SQL.
+                    </p>
+                    <p class="text-gray-400 text-xs sm:text-sm leading-relaxed">
+                        Graduated with a BCA from Maulana Azad University, Jodhpur (2022–2025) and currently pursuing
+                        MCA. Hands-on industry practical experience gained through full-stack software development
+                        internships at Microlent Systems and Anand Rathi Financial Services.
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-4 pt-2">
+                        <div class="glass-panel p-4 rounded-2xl">
+                            <div class="text-cyberGold font-mono font-bold text-2xl">BCA / MCA</div>
+                            <div class="text-xs text-gray-400 mt-1">Computer Applications Graduate</div>
+                        </div>
+                        <div class="glass-panel p-4 rounded-2xl">
+                            <div class="text-cyberGreen font-mono font-bold text-2xl">Python & React</div>
+                            <div class="text-xs text-gray-400 mt-1">Modern Web Stack</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- SECTION 3: CREATURE REALM CONTROLS -->
+        <section id="creatures" class="py-16 px-6 max-w-7xl mx-auto">
+            <div class="text-center space-y-3 mb-12">
+                <div
+                    class="inline-block px-3 py-1 rounded-full bg-cyberGold/10 border border-cyberGold/30 text-cyberGold text-xs font-mono font-semibold uppercase">
+                    Interactive Rigged Creature Physics Engine
+                </div>
+                <h2 class="font-display font-extrabold text-3xl sm:text-5xl text-white">
+                    Summon <span class="text-cyberGold glow-primary">Animated Creatures</span>
+                </h2>
+                <p class="text-gray-400 max-w-xl mx-auto text-xs sm:text-sm">
+                    Click buttons below to unleash procedural bone-rigged 2D/3D animated creatures across your viewport
+                    accompanied by sound synthesizer roars and screen distortion!
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+                <!-- Cyber Panther -->
+                <button onclick="triggerCreature('panther')"
+                    class="btn-cartoon glass-panel p-6 rounded-2xl text-left border-cyberPink/30 hover:border-cyberPink group">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-cyberPink/20 text-cyberPink flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">
+                        🐆
+                    </div>
+                    <h3 class="font-display font-bold text-base text-white">Cyber Panther</h3>
+                    <p class="text-xs text-gray-400 mt-1">Quadruped pounce rig with electric spark ground shockwaves.
+                    </p>
+                    <div class="mt-4 flex items-center text-xs font-semibold text-cyberPink">
+                        <span>Pounce & Sparks</span> <i class="fa-solid fa-bolt ml-2"></i>
+                    </div>
+                </button>
+
+                <!-- Phoenix Dragon -->
+                <button onclick="triggerCreature('dragon')"
+                    class="btn-cartoon glass-panel p-6 rounded-2xl text-left border-red-500/30 hover:border-red-400 group">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">
+                        🐉
+                    </div>
+                    <h3 class="font-display font-bold text-base text-white">Phoenix Dragon</h3>
+                    <p class="text-xs text-gray-400 mt-1">Multi-segment sine-wave body with animated flame stream.</p>
+                    <div class="mt-4 flex items-center text-xs font-semibold text-red-400">
+                        <span>Flame Breath</span> <i class="fa-solid fa-fire ml-2"></i>
+                    </div>
+                </button>
+
+                <!-- Mythic Eagle -->
+                <button onclick="triggerCreature('eagle')"
+                    class="btn-cartoon glass-panel p-6 rounded-2xl text-left border-cyberCyan/30 hover:border-cyberCyan group">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-cyberCyan/20 text-cyberCyan flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">
+                        🦅
+                    </div>
+                    <h3 class="font-display font-bold text-base text-white">Mythic Eagle</h3>
+                    <p class="text-xs text-gray-400 mt-1">Soaring physics with wing flap sound waves.</p>
+                    <div class="mt-4 flex items-center text-xs font-semibold text-cyberCyan">
+                        <span>Sky Swoop</span> <i class="fa-solid fa-wind ml-2"></i>
+                    </div>
+                </button>
+
+                <!-- Mecha Lion -->
+                <button onclick="triggerCreature('lion')"
+                    class="btn-cartoon glass-panel p-6 rounded-2xl text-left border-cyberGold/30 hover:border-cyberGold group">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-cyberGold/20 text-cyberGold flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">
+                        🦁
+                    </div>
+                    <h3 class="font-display font-bold text-base text-white">Golden Lion</h3>
+                    <p class="text-xs text-gray-400 mt-1">Mane shockwave explosion and golden dust storm.</p>
+                    <div class="mt-4 flex items-center text-xs font-semibold text-cyberGold">
+                        <span>Roar Blast</span> <i class="fa-solid fa-crown ml-2"></i>
+                    </div>
+                </button>
+
+            </div>
+
+            <div class="flex justify-center">
+                <button onclick="clearCreatures()"
+                    class="px-5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-500 text-xs text-gray-300 font-mono transition-all">
+                    <i class="fa-solid fa-eraser mr-2"></i> Clear Screen Animations
+                </button>
+            </div>
+        </section>
+
+
+        <!-- SECTION 4: TECHNICAL ARSENAL & SKILL GRAPH -->
+        <section id="skills" class="py-16 px-6 max-w-6xl mx-auto">
+            <div class="text-center space-y-3 mb-12">
+                <h2 class="font-display font-extrabold text-3xl sm:text-5xl text-white">
+                    Technical <span class="text-cyberGreen glow-primary">Arsenal</span>
+                </h2>
+                <p class="text-gray-400 max-w-xl mx-auto text-xs sm:text-sm">
+                    Interactive Physics Node Graph. Click nodes in the radar canvas to pulse physics momentum!
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+
+                <div class="lg:col-span-6 glass-panel p-6 rounded-3xl relative">
+                    <div class="text-xs font-mono text-cyberCyan mb-2 flex justify-between">
+                        <span>Dynamic Node Physics Network</span>
+                        <span>[Click Node to Repel]</span>
+                    </div>
+                    <canvas id="skill-node-canvas"
+                        class="w-full h-80 rounded-2xl bg-slate-950/80 cursor-pointer"></canvas>
+                </div>
+
+                <div class="lg:col-span-6 space-y-4">
+                    <div class="glass-panel p-5 rounded-2xl flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-cyberCyan/20 text-cyberCyan flex items-center justify-center text-2xl font-bold">
+                            🐍</div>
+                        <div class="flex-1">
+                            <div class="flex justify-between text-sm font-bold text-white mb-1">
+                                <span>Python & Flask Framework</span>
+                                <span class="text-cyberCyan">92%</span>
+                            </div>
+                            <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-cyberCyan to-blue-500 rounded-full w-[92%]">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-2xl flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-cyberPink/20 text-cyberPink flex items-center justify-center text-2xl font-bold">
+                            ⚛️</div>
+                        <div class="flex-1">
+                            <div class="flex justify-between text-sm font-bold text-white mb-1">
+                                <span>React.js & Modern JS (ES6+)</span>
+                                <span class="text-cyberPink">90%</span>
+                            </div>
+                            <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-cyberPink to-purple-500 rounded-full w-[90%]">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-2xl flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-cyberGold/20 text-cyberGold flex items-center justify-center text-2xl font-bold">
+                            🎨</div>
+                        <div class="flex-1">
+                            <div class="flex justify-between text-sm font-bold text-white mb-1">
+                                <span>Tailwind CSS & HTML5/CSS3</span>
+                                <span class="text-cyberGold">95%</span>
+                            </div>
+                            <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-cyberGold to-amber-500 rounded-full w-[95%]">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-2xl flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-cyberGreen/20 text-cyberGreen flex items-center justify-center text-2xl font-bold">
+                            🗄️</div>
+                        <div class="flex-1">
+                            <div class="flex justify-between text-sm font-bold text-white mb-1">
+                                <span>SQL & Relational Databases</span>
+                                <span class="text-cyberGreen">88%</span>
+                            </div>
+                            <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-cyberGreen to-teal-500 rounded-full w-[88%]">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- SECTION 5: FEATURED PROJECTS -->
+        <section id="projects" class="py-16 px-6 max-w-7xl mx-auto">
+            <div class="text-center space-y-3 mb-16">
+                <h2 class="font-display font-extrabold text-3xl sm:text-5xl text-white">
+                    Featured <span class="text-cyberCyan glow-primary">Projects</span>
+                </h2>
+                <p class="text-gray-400 max-w-xl mx-auto text-xs sm:text-sm">
+                    Production-ready full-stack applications and administrative platforms.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+
+                <!-- Project 1: AG Traders -->
+                <div
+                    class="glass-panel rounded-3xl overflow-hidden card-3d flex flex-col justify-between group border-slate-800 hover:border-cyberCyan">
+                    <div>
+                        <div class="h-48 bg-slate-950 relative flex items-center justify-center overflow-hidden">
+                            <div class="text-6xl group-hover:scale-125 transition-transform duration-500">🪵</div>
+                            <span
+                                class="absolute top-4 right-4 px-3 py-1 rounded-full bg-slate-900/90 border border-cyberCyan text-cyberCyan font-mono text-[10px]">E-Commerce</span>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <h3
+                                class="font-display font-bold text-xl text-white group-hover:text-cyberCyan transition-colors">
+                                AG Traders</h3>
+                            <p class="text-gray-300 text-xs leading-relaxed">
+                                Full-stack e-commerce web platform for wooden kitchenware. Features dynamic product
+                                catalog search, cart workflows, and admin UI.
+                            </p>
+                            <div class="flex flex-wrap gap-2 font-mono text-[10px] text-cyberCyan">
+                                <span class="px-2 py-1 rounded bg-slate-900 border border-slate-800">React.js</span>
+                                <span class="px-2 py-1 rounded bg-slate-900 border border-slate-800">Tailwind CSS</span>
+                                <span class="px-2 py-1 rounded bg-slate-900 border border-slate-800">Flask</span>
+                                <span class="px-2 py-1 rounded bg-slate-900 border border-slate-800">MySQL</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0">
+                        <button onclick="inspectProject('agtraders')"
+                            class="w-full py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyberCyan text-xs font-mono transition-all flex items-center justify-center gap-2 text-white">
+                            <i class="fa-solid fa-magnifying-glass"></i> Inspect Details
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Project 2: E-Hiring Admin Panel -->
+                <div
+                    class="glass-panel rounded-3xl overflow-hidden card-3d flex flex-col justify-between group border-slate-800 hover:border-cyberPink">
+                    <div>
+                        <div class="h-48 bg-slate-950 relative flex items-center justify-center overflow-hidden">
+                            <div class="text-6xl group-hover:scale-125 transition-transform duration-500">📊</div>
+                            <span
+                                class="absolute top-4 right-4 px-3 py-1 rounded-full bg-slate-900/90 border border-cyberPink text-cyberPink font-mono text-[10px]">Admin
+                                Dashboard</span>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <h3
+                                class="font-display font-bold text-xl text-white group-hover:text-cyberPink transition-colors">
+                                E-Hiring Admin Panel</h3>
+                            <p class="text-gray-300 text-xs leading-relaxed">
+                                Recruitment administrative management panel for candidate pipelines, test template
+                                workflows, automated scoring, and analytics.
+                            </p>
+                            <div class="flex flex-wrap gap-2 font-mono text-[10px] text-cyberPink">
+                                <span class="px-2 py-1 rounded bg-slate-900 border border-slate-800">React.js</span>
+                                <span class="px-2 py-1 rounded bg-slate-900 border border-slate-800">Tailwind CSS</span>
+                                <span class="px-2 py-1 rounded bg-slate-900 border border-slate-800">REST APIs</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0">
+                        <button onclick="inspectProject('ehiring')"
+                            class="w-full py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyberPink text-xs font-mono transition-all flex items-center justify-center gap-2 text-white">
+                            <i class="fa-solid fa-magnifying-glass"></i> Inspect Details
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- SECTION 6: EXPERIENCE & EDUCATION TIMELINE -->
+        <section id="experience" class="py-16 px-6 max-w-5xl mx-auto">
+            <div class="text-center space-y-3 mb-16">
+                <h2 class="font-display font-extrabold text-3xl sm:text-5xl text-white">
+                    Experience & <span class="text-cyberPurple glow-secondary">Timeline</span>
+                </h2>
+                <p class="text-gray-400 max-w-xl mx-auto text-xs sm:text-sm">
+                    Professional software internships, web development training, and academic degree history.
+                </p>
+            </div>
+
+            <div class="relative pl-8 space-y-10 border-l-2 border-slate-800">
+
+                <div class="relative group">
+                    <div
+                        class="absolute -left-[2.5rem] top-1.5 w-6 h-6 rounded-full bg-slate-950 border-2 border-cyberCyan flex items-center justify-center text-[10px] text-cyberCyan">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl space-y-2">
+                        <div class="flex flex-wrap justify-between items-center gap-2">
+                            <h3 class="font-display font-bold text-lg text-white">Full-Stack Web Developer Intern</h3>
+                            <span
+                                class="px-3 py-1 rounded-full bg-cyberCyan/10 text-cyberCyan font-mono text-xs border border-cyberCyan/30">Jan
+                                2026 – Mar 2026</span>
+                        </div>
+                        <div class="text-xs font-semibold text-cyberPink">Microlent Systems, Jodhpur</div>
+                        <ul class="text-xs text-gray-300 space-y-1 list-disc list-inside">
+                            <li>Constructed responsive web frontend components in React.js.</li>
+                            <li>Integrated Flask RESTful APIs with relational SQL backend databases.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <div
+                        class="absolute -left-[2.5rem] top-1.5 w-6 h-6 rounded-full bg-slate-950 border-2 border-cyberPink flex items-center justify-center text-[10px] text-cyberPink">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl space-y-2">
+                        <div class="flex flex-wrap justify-between items-center gap-2">
+                            <h3 class="font-display font-bold text-lg text-white">Software Development Intern</h3>
+                            <span
+                                class="px-3 py-1 rounded-full bg-cyberPink/10 text-cyberPink font-mono text-xs border border-cyberPink/30">2026
+                                (3 Months)</span>
+                        </div>
+                        <div class="text-xs font-semibold text-cyberCyan">Anand Rathi Financial Services, Jodhpur</div>
+                        <ul class="text-xs text-gray-300 space-y-1 list-disc list-inside">
+                            <li>Engineered web modules in Python & Flask framework for internal financial workflows.
+                            </li>
+                            <li>Optimized MySQL database query response speeds.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <div
+                        class="absolute -left-[2.5rem] top-1.5 w-6 h-6 rounded-full bg-slate-950 border-2 border-cyberGold flex items-center justify-center text-[10px] text-cyberGold">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl space-y-2">
+                        <div class="flex flex-wrap justify-between items-center gap-2">
+                            <h3 class="font-display font-bold text-lg text-white">Web Development Training</h3>
+                            <span
+                                class="px-3 py-1 rounded-full bg-cyberGold/10 text-cyberGold font-mono text-xs border border-cyberGold/30">Aug
+                                2025 – Nov 2025</span>
+                        </div>
+                        <div class="text-xs font-semibold text-cyberGold">WsCube Tech, Jodhpur</div>
+                        <p class="text-xs text-gray-300">Hands-on practical training covering full-stack architecture,
+                            REST API design, and modern web application building.</p>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <div
+                        class="absolute -left-[2.5rem] top-1.5 w-6 h-6 rounded-full bg-slate-950 border-2 border-cyberGreen flex items-center justify-center text-[10px] text-cyberGreen">
+                        <i class="fa-solid fa-book"></i>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl space-y-3">
+                        <h3 class="font-display font-bold text-lg text-white">Academic Qualifications</h3>
+                        <div class="border-l-2 border-cyberGreen/40 pl-4">
+                            <div class="text-sm font-bold text-white">Master of Computer Applications (MCA)</div>
+                            <div class="text-xs text-cyberGreen">In Progress</div>
+                        </div>
+                        <div class="border-l-2 border-slate-700 pl-4">
+                            <div class="text-sm font-bold text-white">Bachelor of Computer Applications (BCA)</div>
+                            <div class="text-xs text-gray-400">Maulana Azad University, Jodhpur (2022 – 2025)</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- SECTION 7: INTERACTIVE MINI-GAME PLAYGROUND ARENA -->
+        <section id="playground" class="py-16 px-6 max-w-5xl mx-auto">
+            <div class="text-center space-y-3 mb-10">
+                <div
+                    class="inline-block px-3 py-1 rounded-full bg-cyberCyan/10 border border-cyberCyan/30 text-cyberCyan text-xs font-mono font-semibold uppercase">
+                    Interactive Target Arena
+                </div>
+                <h2 class="font-display font-extrabold text-3xl sm:text-5xl text-white">
+                    Creature <span class="text-cyberCyan glow-primary">Playground</span>
+                </h2>
+                <p class="text-gray-400 max-w-xl mx-auto text-xs sm:text-sm">
+                    Click floating energy targets in the canvas arena to test your reaction speed and trigger audio
+                    blasts!
+                </p>
+            </div>
+
+            <div class="glass-panel p-6 rounded-3xl relative overflow-hidden text-center space-y-4">
+                <div class="flex justify-between items-center text-xs font-mono px-2">
+                    <span class="text-cyberGold">Score: <span id="game-score"
+                            class="font-bold text-white">0</span></span>
+                    <span class="text-cyberPink">Combo: <span id="game-combo"
+                            class="font-bold text-white">1x</span></span>
+                    <button onclick="resetGame()"
+                        class="px-3 py-1 rounded-lg bg-slate-900 border border-slate-700 text-gray-300 hover:text-white">Reset
+                        Game</button>
+                </div>
+                <canvas id="game-arena-canvas"
+                    class="w-full h-72 rounded-2xl bg-slate-950/90 cursor-crosshair border border-slate-800"></canvas>
+            </div>
+        </section>
+
+
+        <!-- SECTION 8: INTERACTIVE CLI COMMAND TERMINAL -->
+        <section id="terminal" class="py-16 px-6 max-w-4xl mx-auto">
+            <div class="glass-panel rounded-3xl overflow-hidden border-slate-800 shadow-2xl">
+                <div
+                    class="bg-slate-950 px-6 py-3 border-b border-slate-800 flex items-center justify-between font-mono text-xs text-gray-400">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                        <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
+                        <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                        <span class="ml-2 font-semibold text-white">azim@dev-terminal:~</span>
+                    </div>
+                    <div>Interactive Shell v2.5</div>
+                </div>
+
+                <div id="cli-output" class="p-6 h-64 overflow-y-auto font-mono text-xs space-y-2 text-gray-300">
+                    <p class="text-cyberGreen">Welcome to Abdul Azim Ansari's Cinematic Portfolio Shell!</p>
+                    <p class="text-gray-400">Type <span class="text-cyberCyan font-bold">'help'</span> to view available
+                        terminal commands.</p>
+                </div>
+
+                <form onsubmit="handleCliCommand(event)"
+                    class="bg-slate-950/80 px-6 py-3 border-t border-slate-800 flex items-center gap-3">
+                    <span class="text-cyberPink font-mono font-bold">$</span>
+                    <input type="text" id="cli-input"
+                        placeholder="Type command here (e.g., help, skills, summon dragon, theme)..."
+                        class="w-full bg-transparent font-mono text-xs text-cyberCyan focus:outline-none">
+                    <button type="submit" class="text-xs font-mono text-cyberGreen hover:underline">RUN</button>
+                </form>
+            </div>
+        </section>
+
+
+        <!-- SECTION 9: CONTACT FORM -->
+        <section id="contact" class="py-16 px-6 max-w-4xl mx-auto">
+            <div class="glass-panel p-8 sm:p-12 rounded-3xl relative">
+
+                <div class="text-center space-y-3 mb-10">
+                    <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-white">
+                        Connect With <span class="text-cyberCyan glow-primary">Abdul Azim</span>
+                    </h2>
+                    <p class="text-gray-400 text-xs sm:text-sm">
+                        Based in Jodhpur, Rajasthan, India. Send a direct message below!
+                    </p>
+                </div>
+
+                <form onsubmit="submitContact(event)" class="space-y-5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-mono text-gray-300 uppercase">Your Name</label>
+                            <input type="text" required placeholder="John Doe"
+                                class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-gray-500 focus:outline-none focus:border-cyberCyan text-sm">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-mono text-gray-300 uppercase">Your Email</label>
+                            <input type="email" required placeholder="john@example.com"
+                                class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-gray-500 focus:outline-none focus:border-cyberCyan text-sm">
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-mono text-gray-300 uppercase">Message</label>
+                        <textarea rows="4" required placeholder="Hello Abdul Azim, I would like to discuss..."
+                            class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-gray-500 focus:outline-none focus:border-cyberCyan text-sm"></textarea>
+                    </div>
+
+                    <button type="submit" id="contact-btn"
+                        class="btn-cartoon w-full py-4 rounded-xl bg-gradient-to-r from-cyberCyan via-teal-400 to-cyberPink text-slate-950 font-black text-sm flex items-center justify-center gap-2">
+                        <span>Send Message</span> <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+
+                <div id="contact-msg" class="hidden mt-6 p-4 rounded-xl text-center text-xs font-mono font-semibold">
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- PROJECT INSPECTOR MODAL POPUP -->
+    <div id="project-modal"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden">
+        <div class="glass-panel max-w-2xl w-full p-6 sm:p-8 rounded-3xl relative space-y-4">
+            <button onclick="closeModal()" class="absolute top-6 right-6 text-gray-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="modal-content" class="space-y-4"></div>
+        </div>
+    </div>
+
+
+    <!-- Footer -->
+    <footer class="relative z-10 border-t border-slate-800 py-8 px-6 text-center text-xs text-gray-500">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                © 2026 <span class="text-white font-semibold">Abdul Azim Ansari</span>. Engineered with HTML5 Canvas,
+                Three.js, GSAP & Web Audio API.
+            </div>
+            <div class="flex space-x-4 text-base text-gray-400">
+                <a href="https://github.com/AbduLAzim7014" target="_blank"
+                    class="hover:text-cyberCyan transition-colors"><i class="fa-brands fa-github"></i></a>
+                <a href="mailto:contact@abdulazim.dev" class="hover:text-cyberPink transition-colors"><i
+                        class="fa-solid fa-envelope"></i></a>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- JAVASCRIPT LOGIC ENGINE -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // ----------------------------------------------------
+        // 1. CURSOR SPOTLIGHT & MOUSE PUPIL TRACKING
+        // ----------------------------------------------------
+        const cursor = document.getElementById('custom-cursor');
+        const cursorDot = document.getElementById('custom-cursor-dot');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.top = `${e.clientY}px`;
+            cursor.style.left = `${e.clientX}px`;
+            cursorDot.style.top = `${e.clientY}px`;
+            cursorDot.style.left = `${e.clientX}px`;
+
+            updateMascotEyes(e.clientX, e.clientY);
+        });
+
+        function updateMascotEyes(mx, my) {
+            const svg = document.getElementById('jarvis-mascot-svg');
+            if (!svg) return;
+            const rect = svg.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+
+            const dx = (mx - cx) / 25;
+            const dy = (my - cy) / 25;
+
+            const pupilL = document.getElementById('pupil-left');
+            const pupilR = document.getElementById('pupil-right');
+
+            if (pupilL && pupilR) {
+                const limitX = Math.max(-5, Math.min(5, dx));
+                const limitY = Math.max(-5, Math.min(5, dy));
+                pupilL.setAttribute('cx', 75 + limitX);
+                pupilL.setAttribute('cy', 80 + limitY);
+                pupilR.setAttribute('cx', 125 + limitX);
+                pupilR.setAttribute('cy', 80 + limitY);
+            }
+        }
+
+        // 3D Card Tilt with Parallax
+        document.querySelectorAll('.card-3d').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                card.style.transform = `perspective(1000px) rotateX(${-y / 15}deg) rotateY(${x / 15}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+            });
+        });
+
+
+        // ----------------------------------------------------
+        // 2. ADVANCED WEB AUDIO SYNTHESIZER ENGINE
+        // ----------------------------------------------------
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function toggleAudio() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('sound-icon');
+            if (soundEnabled) {
+                icon.className = "fa-solid fa-volume-high text-sm";
+                playSynthSound('beep');
+            } else {
+                icon.className = "fa-solid fa-volume-xmark text-sm";
+            }
+        }
+
+        function playSynthSound(type) {
+            if (!soundEnabled) return;
+            initAudio();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'beep') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.08);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                osc.start(now); osc.stop(now + 0.08);
+            } else if (type === 'panther') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.exponentialRampToValueAtTime(40, now + 0.45);
+                gain.gain.setValueAtTime(0.35, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+                osc.start(now); osc.stop(now + 0.45);
+            } else if (type === 'dragon') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(90, now);
+                osc.frequency.linearRampToValueAtTime(380, now + 0.35);
+                osc.frequency.exponentialRampToValueAtTime(50, now + 0.85);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.85);
+                osc.start(now); osc.stop(now + 0.85);
+            } else if (type === 'eagle') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(750, now);
+                osc.frequency.exponentialRampToValueAtTime(1500, now + 0.35);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now); osc.stop(now + 0.5);
+            } else if (type === 'lion') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(160, now);
+                osc.frequency.exponentialRampToValueAtTime(30, now + 0.75);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.75);
+                osc.start(now); osc.stop(now + 0.75);
+            } else if (type === 'pop') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            }
+        }
+
+
+        // ----------------------------------------------------
+        // 3. THREE.JS 3D BACKGROUND AMBIENT PARTICLES
+        // ----------------------------------------------------
+        let scene, camera, renderer, pointsMesh;
+
+        function init3D() {
+            const container = document.getElementById('bg-3d-canvas');
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 400;
+
+            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            const count = 1500;
+            const positions = new Float32Array(count * 3);
+            for (let i = 0; i < count * 3; i++) {
+                positions[i] = (Math.random() - 0.5) * 1200;
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const material = new THREE.PointsMaterial({
+                color: 0x00f3ff,
+                size: 2,
+                transparent: true,
+                opacity: 0.55
+            });
+
+            pointsMesh = new THREE.Points(geometry, material);
+            scene.add(pointsMesh);
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+            if (pointsMesh) {
+                pointsMesh.rotation.y += 0.0006;
+                pointsMesh.rotation.x += 0.0003;
+            }
+            renderer.render(scene, camera);
+        }
+
+
+        // ----------------------------------------------------
+        // 4. BONE-RIGGED CREATURE CANVAS ANIMATION
+        // ----------------------------------------------------
+        const creatureCanvas = document.getElementById('creature-canvas');
+        const creatureCtx = creatureCanvas.getContext('2d');
+        let activeCreatures = [];
+
+        function resizeCreatureCanvas() {
+            creatureCanvas.width = window.innerWidth;
+            creatureCanvas.height = window.innerHeight;
+        }
+        resizeCreatureCanvas();
+        window.addEventListener('resize', resizeCreatureCanvas);
+
+        class RiggedCreature {
+            constructor(type) {
+                this.type = type;
+                this.particles = [];
+                this.alive = true;
+                this.time = 0;
+
+                if (type === 'panther') {
+                    this.emoji = '🐆'; this.x = -120; this.y = window.innerHeight * 0.7;
+                    this.vx = 18; this.vy = 0; this.size = 75; this.color = '#ff007f';
+                } else if (type === 'dragon') {
+                    this.emoji = '🐉'; this.x = -120; this.y = window.innerHeight * 0.35;
+                    this.vx = 10; this.vy = -1; this.size = 95; this.color = '#ef4444';
+                } else if (type === 'eagle') {
+                    this.emoji = '🦅'; this.x = -120; this.y = window.innerHeight * 0.25;
+                    this.vx = 14; this.vy = 1; this.size = 70; this.color = '#00f3ff';
+                } else if (type === 'lion') {
+                    this.emoji = '🦁'; this.x = -120; this.y = window.innerHeight * 0.6;
+                    this.vx = 12; this.vy = -0.5; this.size = 85; this.color = '#ffd700';
+                }
+            }
+
+            update() {
+                this.time += 0.1;
+                this.x += this.vx;
+                this.y += Math.sin(this.time) * 3 + this.vy;
+
+                // Particle Trail
+                for (let i = 0; i < 4; i++) {
+                    this.particles.push({
+                        x: this.x + (Math.random() - 0.5) * 25,
+                        y: this.y + (Math.random() - 0.5) * 25,
+                        radius: Math.random() * 6 + 2,
+                        color: this.color,
+                        alpha: 1,
+                        vx: (Math.random() - 0.5) * 2 - this.vx * 0.2,
+                        vy: (Math.random() - 0.5) * 2
+                    });
+                }
+
+                this.particles.forEach((p, index) => {
+                    p.x += p.vx; p.y += p.vy; p.alpha -= 0.025;
+                    if (p.alpha <= 0) this.particles.splice(index, 1);
+                });
+
+                if (this.x > window.innerWidth + 180) this.alive = false;
+            }
+
+            draw() {
+                this.particles.forEach(p => {
+                    creatureCtx.save();
+                    creatureCtx.globalAlpha = p.alpha;
+                    creatureCtx.fillStyle = p.color;
+                    creatureCtx.beginPath();
+                    creatureCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    creatureCtx.fill();
+                    creatureCtx.restore();
+                });
+
+                creatureCtx.save();
+                creatureCtx.font = `${this.size}px sans-serif`;
+                creatureCtx.shadowColor = this.color;
+                creatureCtx.shadowBlur = 25;
+                creatureCtx.fillText(this.emoji, this.x, this.y);
+                creatureCtx.restore();
+            }
+        }
+
+        function triggerCreature(type) {
+            playSynthSound(type);
+            triggerCameraShake();
+            activeCreatures.push(new RiggedCreature(type));
+        }
+
+        function triggerCameraShake() {
+            const wrapper = document.getElementById('app-wrapper');
+            wrapper.classList.add('shake-screen');
+            setTimeout(() => wrapper.classList.remove('shake-screen'), 400);
+        }
+
+        function clearCreatures() {
+            activeCreatures = [];
+            creatureCtx.clearRect(0, 0, creatureCanvas.width, creatureCanvas.height);
+        }
+
+        function renderCreatureLoop() {
+            creatureCtx.clearRect(0, 0, creatureCanvas.width, creatureCanvas.height);
+            activeCreatures.forEach((creature, index) => {
+                creature.update();
+                creature.draw();
+                if (!creature.alive) activeCreatures.splice(index, 1);
+            });
+            requestAnimationFrame(renderCreatureLoop);
+        }
+
+
+        // ----------------------------------------------------
+        // 5. INTERACTIVE SKILL NODE GRAPH
+        // ----------------------------------------------------
+        const skillCanvas = document.getElementById('skill-node-canvas');
+        const skillCtx = skillCanvas.getContext('2d');
+
+        function resizeSkillCanvas() {
+            if (!skillCanvas) return;
+            skillCanvas.width = skillCanvas.parentElement.clientWidth;
+            skillCanvas.height = 320;
+        }
+
+        let skillNodes = [
+            { label: 'Python', x: 80, y: 80, vx: 1, vy: 0.8, color: '#00f3ff' },
+            { label: 'Flask', x: 220, y: 120, vx: -0.8, vy: 1, color: '#ff007f' },
+            { label: 'React.js', x: 150, y: 220, vx: 1.2, vy: -0.6, color: '#ffd700' },
+            { label: 'Tailwind', x: 300, y: 200, vx: -1, vy: -0.8, color: '#00ff88' },
+            { label: 'SQL', x: 280, y: 70, vx: 0.7, vy: 0.9, color: '#a855f7' }
+        ];
+
+        function animateSkillGraph() {
+            if (!skillCanvas.width) resizeSkillCanvas();
+            skillCtx.clearRect(0, 0, skillCanvas.width, skillCanvas.height);
+
+            for (let i = 0; i < skillNodes.length; i++) {
+                for (let j = i + 1; j < skillNodes.length; j++) {
+                    skillCtx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+                    skillCtx.lineWidth = 1.5;
+                    skillCtx.beginPath();
+                    skillCtx.moveTo(skillNodes[i].x, skillNodes[i].y);
+                    skillCtx.lineTo(skillNodes[j].x, skillNodes[j].y);
+                    skillCtx.stroke();
+                }
+            }
+
+            skillNodes.forEach(node => {
+                node.x += node.vx;
+                node.y += node.vy;
+
+                if (node.x < 40 || node.x > skillCanvas.width - 40) node.vx *= -1;
+                if (node.y < 40 || node.y > skillCanvas.height - 40) node.vy *= -1;
+
+                skillCtx.fillStyle = node.color;
+                skillCtx.shadowColor = node.color;
+                skillCtx.shadowBlur = 15;
+                skillCtx.beginPath();
+                skillCtx.arc(node.x, node.y, 14, 0, Math.PI * 2);
+                skillCtx.fill();
+
+                skillCtx.fillStyle = '#ffffff';
+                skillCtx.font = '11px Fira Code';
+                skillCtx.fillText(node.label, node.x - 20, node.y + 28);
+            });
+
+            requestAnimationFrame(animateSkillGraph);
+        }
+
+        if (skillCanvas) {
+            skillCanvas.addEventListener('click', () => {
+                skillNodes.forEach(node => {
+                    node.vx = (Math.random() - 0.5) * 5;
+                    node.vy = (Math.random() - 0.5) * 5;
+                });
+                playSynthSound('beep');
+            });
+        }
+
+
+        // ----------------------------------------------------
+        // 6. MINI-GAME TARGET PLAYGROUND ARENA
+        // ----------------------------------------------------
+        const gameCanvas = document.getElementById('game-arena-canvas');
+        const gameCtx = gameCanvas ? gameCanvas.getContext('2d') : null;
+        let gameScore = 0;
+        let gameCombo = 1;
+        let targets = [];
+
+        function resizeGameCanvas() {
+            if (!gameCanvas) return;
+            gameCanvas.width = gameCanvas.parentElement.clientWidth;
+            gameCanvas.height = 280;
+        }
+
+        function spawnTarget() {
+            if (!gameCanvas) return;
+            targets.push({
+                x: Math.random() * (gameCanvas.width - 60) + 30,
+                y: Math.random() * (gameCanvas.height - 60) + 30,
+                radius: Math.random() * 12 + 16,
+                color: ['#00f3ff', '#ff007f', '#ffd700', '#00ff88'][Math.floor(Math.random() * 4)],
+                alpha: 1
+            });
+        }
+
+        function updateGameArena() {
+            if (!gameCanvas || !gameCtx) return;
+            if (!gameCanvas.width) resizeGameCanvas();
+
+            gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+            if (targets.length < 5 && Math.random() < 0.05) spawnTarget();
+
+            targets.forEach((t, index) => {
+                t.alpha -= 0.003;
+                if (t.alpha <= 0) targets.splice(index, 1);
+
+                gameCtx.save();
+                gameCtx.globalAlpha = t.alpha;
+                gameCtx.fillStyle = t.color;
+                gameCtx.shadowColor = t.color;
+                gameCtx.shadowBlur = 15;
+                gameCtx.beginPath();
+                gameCtx.arc(t.x, t.y, t.radius, 0, Math.PI * 2);
+                gameCtx.fill();
+                gameCtx.restore();
+            });
+
+            requestAnimationFrame(updateGameArena);
+        }
+
+        if (gameCanvas) {
+            gameCanvas.addEventListener('click', (e) => {
+                const rect = gameCanvas.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const clickY = e.clientY - rect.top;
+
+                targets.forEach((t, index) => {
+                    const dist = Math.hypot(t.x - clickX, t.y - clickY);
+                    if (dist < t.radius + 10) {
+                        targets.splice(index, 1);
+                        gameScore += 10 * gameCombo;
+                        gameCombo += 1;
+                        document.getElementById('game-score').innerText = gameScore;
+                        document.getElementById('game-combo').innerText = `${gameCombo}x`;
+                        playSynthSound('pop');
+                    }
+                });
+            });
+        }
+
+        function resetGame() {
+            gameScore = 0;
+            gameCombo = 1;
+            targets = [];
+            if (document.getElementById('game-score')) {
+                document.getElementById('game-score').innerText = '0';
+                document.getElementById('game-combo').innerText = '1x';
+            }
+        }
+
+
+        // ----------------------------------------------------
+        // 7. MASCOT BOT INTERACTION
+        // ----------------------------------------------------
+        function clickMascot() {
+            playSynthSound('eagle');
+            const mascot = document.getElementById('jarvis-mascot-svg');
+            const speech = document.getElementById('mascot-speech');
+
+            gsap.to(mascot, {
+                rotation: 360, scale: 1.15, duration: 0.6, ease: "back.out(1.7)", onComplete: () => {
+                    gsap.to(mascot, { rotation: 0, scale: 1, duration: 0.3 });
+                }
+            });
+
+            const msgs = [
+                "BEEP BOOP! Abdul Azim Ansari is ready for full-stack builds!",
+                "Check out AG Traders E-Commerce in the Projects section!",
+                "Summon the Phoenix Dragon for flame breath! 🐉",
+                "Based in Jodhpur, Rajasthan, India! 📍"
+            ];
+            speech.innerText = msgs[Math.floor(Math.random() * msgs.length)];
+        }
+
+
+        // ----------------------------------------------------
+        // 8. CLI TERMINAL ENGINE
+        // ----------------------------------------------------
+        function handleCliCommand(e) {
+            e.preventDefault();
+            const input = document.getElementById('cli-input');
+            const output = document.getElementById('cli-output');
+            const cmd = input.value.trim().toLowerCase();
+            input.value = '';
+
+            const line = document.createElement('p');
+            line.className = "text-cyberPink";
+            line.innerHTML = `$ ${cmd}`;
+            output.appendChild(line);
+
+            const res = document.createElement('p');
+            res.className = "text-gray-300";
+
+            if (cmd === 'help') {
+                res.innerHTML = `Available Commands:<br>- <span class="text-cyberCyan">whoami</span>: View candidate info<br>- <span class="text-cyberCyan">skills</span>: Core skill breakdown<br>- <span class="text-cyberCyan">projects</span>: Project list<br>- <span class="text-cyberCyan">summon dragon / panther / eagle / lion</span>: Trigger creature physics<br>- <span class="text-cyberCyan">theme</span>: Cycle themes<br>- <span class="text-cyberCyan">clear</span>: Clear output`;
+            } else if (cmd === 'whoami') {
+                res.innerText = "Abdul Azim Ansari — Full-Stack Web Developer | BCA Graduate & MCA Student | Jodhpur, Rajasthan, India";
+            } else if (cmd === 'skills') {
+                res.innerText = "Python, Flask, React.js, JavaScript, HTML5, CSS3, Tailwind CSS, SQL, Git, GitHub, Vercel";
+            } else if (cmd === 'projects') {
+                res.innerText = "1. AG Traders E-Commerce | 2. E-Hiring Admin Panel";
+            } else if (cmd === 'summon dragon') {
+                triggerCreature('dragon');
+                res.innerText = "Phoenix Dragon unleashed!";
+            } else if (cmd === 'summon panther') {
+                triggerCreature('panther');
+                res.innerText = "Cyber Panther released!";
+            } else if (cmd === 'clear') {
+                output.innerHTML = '';
+                return;
+            } else {
+                res.innerHTML = `<span class="text-red-400">Command not found. Type 'help' for commands.</span>`;
+            }
+
+            output.appendChild(res);
+            output.scrollTop = output.scrollHeight;
+            playSynthSound('beep');
+        }
+
+
+        // ----------------------------------------------------
+        // 9. THEME ENGINE & MODAL INSPECTOR
+        // ----------------------------------------------------
+        function changeTheme(theme) {
+            const root = document.documentElement;
+            if (theme === 'cyber') {
+                root.style.setProperty('--primary', '#00f3ff');
+                root.style.setProperty('--secondary', '#ff007f');
+                root.style.setProperty('--bg', '#03050d');
+            } else if (theme === 'space') {
+                root.style.setProperty('--primary', '#a855f7');
+                root.style.setProperty('--secondary', '#00f3ff');
+                root.style.setProperty('--bg', '#030210');
+            } else if (theme === 'gold') {
+                root.style.setProperty('--primary', '#ffd700');
+                root.style.setProperty('--secondary', '#ff4500');
+                root.style.setProperty('--bg', '#0c0800');
+            } else if (theme === 'matrix') {
+                root.style.setProperty('--primary', '#00ff88');
+                root.style.setProperty('--secondary', '#00f3ff');
+                root.style.setProperty('--bg', '#000c05');
+            }
+            playSynthSound('beep');
+        }
+
+        const projectData = {
+            agtraders: {
+                title: "AG Traders E-Commerce Platform",
+                tech: "React.js | Tailwind CSS | Flask | MySQL",
+                desc: "Full-stack e-commerce web platform engineered for wooden kitchenware sales. Features dynamic search filters, persistent cart state, user auth, and complete admin dashboard."
+            },
+            ehiring: {
+                title: "E-Hiring Administrative Panel",
+                tech: "React.js | Tailwind CSS | RESTful APIs",
+                desc: "Recruitment administrative center featuring candidate pipeline workflows, exam template creation, automated test grading, and real-time candidate analytics."
+            }
+        };
+
+        function inspectProject(key) {
+            const data = projectData[key];
+            if (!data) return;
+            const modal = document.getElementById('project-modal');
+            const content = document.getElementById('modal-content');
+
+            content.innerHTML = `
+                <div class="inline-block px-3 py-1 rounded-full bg-cyberCyan/10 border border-cyberCyan text-cyberCyan font-mono text-xs">
+                    ${data.tech}
+                </div>
+                <h3 class="font-display font-black text-2xl text-white">${data.title}</h3>
+                <p class="text-gray-300 text-xs sm:text-sm leading-relaxed">${data.desc}</p>
+                <div class="pt-4 flex justify-end">
+                    <button onclick="closeModal()" class="px-5 py-2.5 rounded-xl bg-cyberCyan text-slate-950 font-bold text-xs">
+                        Close Inspector
+                    </button>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+            playSynthSound('beep');
+        }
+
+        function closeModal() {
+            document.getElementById('project-modal').classList.add('hidden');
+        }
+
+        function submitContact(e) {
+            e.preventDefault();
+            playSynthSound('dragon');
+
+            const btn = document.getElementById('contact-btn');
+            const msg = document.getElementById('contact-msg');
+
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> Sending...`;
+
+            setTimeout(() => {
+                msg.className = "mt-6 p-4 rounded-xl text-center text-xs font-mono font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+                msg.innerHTML = `<i class="fa-solid fa-check-circle mr-1"></i> Message delivered successfully to Abdul Azim Ansari!`;
+                msg.classList.remove('hidden');
+                btn.innerHTML = `<span>Send Message</span> <i class="fa-solid fa-paper-plane"></i>`;
+                e.target.reset();
+            }, 1200);
+        }
+
+
+        // ----------------------------------------------------
+        // INITIALIZATION
+        // ----------------------------------------------------
+        window.onload = function () {
+            init3D();
+            animate3D();
+            renderCreatureLoop();
+            resizeSkillCanvas();
+            animateSkillGraph();
+            resizeGameCanvas();
+            updateGameArena();
+        };
+    </script>
+</body>
+
+</html>
